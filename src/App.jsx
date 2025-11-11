@@ -16,39 +16,37 @@ import Issue from "./views/Issue";
 import Retrieve from "./views/Retrieve";
 import CertificateTemplate from "./views/CertificateTemplate";
 import Certificates from "./views/Certificates";
-import { getCount, getMetaData, getOwnerOf } from "./SmartContract";
-import axios from "axios";
-import { certificateActions } from "./store/certificate-slice";
 import UserLogin from "./views/UserLogin";
 import UserCertificates from "./views/UserCertificates";
+import { fetchCertificates } from "./store/certificate-slice";
 
 const getStoredRole = () =>
     typeof window !== "undefined" ? window.sessionStorage.getItem("authRole") : null;
 
+const RedirectToDashboard = () => {
+    const role = getStoredRole();
+    const redirectPath = role === 'user' ? '/user' : '/admin';
+    return <Navigate to={redirectPath} replace />;
+};
+
 const ProtectedRoute = ({ allowedRole, redirectTo }) => {
-    const location = useLocation();
     const role = getStoredRole();
     const isAuthorized = role === allowedRole;
 
     return (
         <>
             <SignedIn>
-                {isAuthorized ? (
-                    <Outlet />
-                ) : (
-                    <Navigate to={redirectTo} replace state={{ from: location }} />
-                )}
+                {isAuthorized ? <Outlet /> : <RedirectToDashboard />}
             </SignedIn>
             <SignedOut>
-                <Navigate to={redirectTo} replace state={{ from: location }} />
+                <Navigate to={redirectTo} replace />
             </SignedOut>
         </>
     );
 };
 
 const AuthRoute = () => {
-    const role = getStoredRole();
-    const destination = role === "user" ? "/user" : "/admin";
+    const location = useLocation();
 
     return (
         <>
@@ -56,15 +54,14 @@ const AuthRoute = () => {
                 <AdminLogin />
             </SignedOut>
             <SignedIn>
-                <Navigate to={destination} replace />
+                {location.pathname.includes('sso-callback') ? <Outlet /> : <RedirectToDashboard />}
             </SignedIn>
         </>
     );
 };
 
 const UserAuthRoute = () => {
-    const role = getStoredRole();
-    const destination = role === "admin" ? "/admin" : "/user";
+    const location = useLocation();
 
     return (
         <>
@@ -72,70 +69,27 @@ const UserAuthRoute = () => {
                 <UserLogin />
             </SignedOut>
             <SignedIn>
-                <Navigate to={destination} replace />
+                {location.pathname.includes('sso-callback') ? <Outlet /> : <RedirectToDashboard />}
             </SignedIn>
         </>
     );
 };
 
-
-
-
-
 const App = () => {
     const dispatch = useDispatch();
-    const myFun = async () => {
-        try {
-            const count = await getCount();
-            const organizations = new Set();
 
-            for (let tokenId = 1; tokenId <= count; tokenId++) {
-                try {
-                    const result = await getMetaData(tokenId);
-                    const [jsonCID, CertificateCID] = result.split(",");
-                    if (!jsonCID) continue;
-
-                    const [response, ownerAddress] = await Promise.all([
-                        axios.get(`https://ipfs.io/ipfs/${jsonCID}`),
-                        getOwnerOf(tokenId),
-                    ]);
-
-                    const metadataWithOwner = {
-                        ...response.data,
-                        walletAddress: ownerAddress?.toLowerCase(),
-                    };
-
-                    dispatch(
-                        certificateActions.addCertificate({
-                            CertificateCID,
-                            metadata: metadataWithOwner,
-                            id: tokenId,
-                        })
-                    );
-
-                    if (metadataWithOwner.organization) {
-                        organizations.add(metadataWithOwner.organization);
-                    }
-                } catch (tokenError) {
-                    console.error(`Failed to fetch metadata for token ${tokenId}`, tokenError);
-                }
-            }
-
-            dispatch(certificateActions.setOrganizations([...organizations]));
-        } catch (error) {
-            console.error("Unable to load certificates from chain", error);
-        }
-    };
     useEffect(() => {
-        myFun();
-    }, []);
+        dispatch(fetchCertificates());
+    }, [dispatch]);
 
     return (
         <>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Navigate to="/admin" replace />} />
-                    <Route path="/sign-in" element={<AuthRoute />} />
+                    <Route path="/sign-in" element={<AuthRoute />}>
+                        <Route path="sso-callback" element={<Outlet />} />
+                    </Route>
                     <Route path="/user-sign-in" element={<UserAuthRoute />} />
                     <Route
                         path="/admin"

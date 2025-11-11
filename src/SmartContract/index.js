@@ -1,6 +1,6 @@
 import contract from "./abi.json";
 import { ethers } from "ethers";
-const contractAddress = "0xEc59Db10255668D6e0df90D1eac9e89a06924a77";
+const contractAddress = "0x23cB9cC6125DD5b83E5b8D94d7c45D0B123e0a0A";
 
 const infuraProvider = new ethers.providers.JsonRpcProvider(
     "https://eth-sepolia.g.alchemy.com/v2/zEotRHIHt762GqCfnaj6tDD0ZH-GswVB"
@@ -53,7 +53,7 @@ export const requestAccount = async () => {
 };
 
 export const getCount = async () => {
-    const res = await readOnlyContract.getCount();
+    const res = await readOnlyContract.totalSupply();
 
     // console.log(res.toNumber());
     return res.toNumber();
