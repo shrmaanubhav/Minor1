@@ -15,7 +15,7 @@ function UserLogin() {
   // Optional: show loading state while Privy is initializing
   if (!ready) return <div className="auth-layout">Connecting wallet...</div>;
 
-  return ( 
+  return (
     <div className="auth-layout">
       <section className="auth-card">
         <p className="text-sm mb-4">
