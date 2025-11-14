@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAccount } from "wagmi";
+import { useWeb3AuthAccount } from "../providers/Web3AuthProvider";
 import Nav from "../components/Nav";
 import CertificateCard from "../components/CertificateCard";
 import { fetchCertificates } from "../store/certificate-slice";
@@ -9,7 +9,7 @@ const normalizeAddress = (address = "") => address.trim().toLowerCase();
 
 const UserCertificates = () => {
   const dispatch = useDispatch();
-  const { address, isConnecting } = useAccount();
+  const { address, isConnecting } = useWeb3AuthAccount();
   const {
     certificates,
     status: fetchStatus,

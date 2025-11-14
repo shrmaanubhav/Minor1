@@ -1,17 +1,17 @@
 import React, { useMemo, useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
+  useWeb3AuthAccount,
   useWeb3AuthConnect,
   useWeb3AuthDisconnect,
-} from "@web3auth/modal/react";
-import { useAccount } from "wagmi";
+} from "../providers/Web3AuthProvider";
 
 const Nav = ({ cmp }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, connect } = useWeb3AuthConnect();
   const { disconnect } = useWeb3AuthDisconnect();
-  const { address } = useAccount();
+  const { address } = useWeb3AuthAccount();
 
   const [role, setRole] = useState(() => {
     if (typeof window === "undefined") return null;

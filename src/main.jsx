@@ -6,10 +6,10 @@ import { Provider } from "react-redux";
 import store from "./store";
 import {
   Web3AuthProvider,
+  WagmiProvider,
   useWeb3Auth,
   useWeb3AuthConnect,
-} from "@web3auth/modal/react";
-import { WagmiProvider } from "@web3auth/modal/react/wagmi";
+} from "./providers/Web3AuthProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import web3AuthContextConfig from "./auth/web3authContext";
 

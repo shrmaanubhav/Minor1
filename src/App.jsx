@@ -16,8 +16,11 @@ import { getCount, getMetaData, getOwnerOf } from "./SmartContract";
 import axios from "axios";
 import { certificateActions } from "./store/certificate-slice";
 
-import { useWeb3AuthConnect, useWeb3AuthUser } from "@web3auth/modal/react";
-import { useAccount } from "wagmi";
+import {
+  useWeb3AuthAccount,
+  useWeb3AuthConnect,
+  useWeb3AuthUser,
+} from "./providers/Web3AuthProvider";
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:4000";
 
@@ -78,7 +81,7 @@ const App = () => {
   const dispatch = useDispatch();
   const { isConnected, status, connect } = useWeb3AuthConnect();
   const { userInfo } = useWeb3AuthUser();
-  const { address } = useAccount();
+  const { address } = useWeb3AuthAccount();
   const lastSyncedUser = useRef({ email: null, address: null });
 
   console.log(
