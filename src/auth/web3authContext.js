@@ -1,4 +1,4 @@
-import { WEB3AUTH_NETWORK } from "@web3auth/modal";
+import { WEB3AUTH_NETWORK } from "@web3auth/base";
 
 const clientId = import.meta.env.VITE_WEB3AUTH_CLIENT_ID;
 

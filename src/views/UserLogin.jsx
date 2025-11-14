@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useWeb3AuthConnect, useWeb3AuthUser } from "@web3auth/modal/react";
-import { useAccount } from "wagmi";
+import {
+  useWeb3AuthAccount,
+  useWeb3AuthConnect,
+  useWeb3AuthUser,
+} from "../providers/Web3AuthProvider";
 import "./Auth.css";
 
 function UserLogin() {
   const { connect, isConnected } = useWeb3AuthConnect();
   const { userInfo } = useWeb3AuthUser();
-  const { address } = useAccount();
+  const { address } = useWeb3AuthAccount();
   const navigate = useNavigate();
 
   useEffect(() => {
